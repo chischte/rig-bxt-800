@@ -26,7 +26,9 @@
 //DECLARATION OF VARIABLES
 //***************************************************************************
 int CurrentPage;
-String cycle_name[] = {"1 AUFWECKEN", "2 VORSCHIEBEN", "3 SCHNEIDEN", "4 FESTKLEMMEN", "5 KRAFTAUFBAU", "6 SPANNEN", "7 SCHWEISSEN", "8 ABKUELHEN", "9 ENTSPANNEN", "10 ENTKLEMMEN", "11 ZURUECKFAHREN", "12 PAUSE"};
+String cycle_name[] = { "1 AUFWECKEN", "2 VORSCHIEBEN", "3 SCHNEIDEN", "4 FESTKLEMMEN",
+        "5 KRAFTAUFBAU", "6 SPANNEN", "7 SCHWEISSEN", "8 ABKUELHEN", "9 ENTSPANNEN",
+        "10 ENTKLEMMEN", "11 ZURUECKFAHREN", "12 PAUSE" };
 //***************************************************************************
 //NEXTION SWITCH STATES LIST
 //Every nextion switch button (dualstate) needs a switchstate variable to control switchtoggle
@@ -76,14 +78,14 @@ NexDSButton nex_switch_mode = NexDSButton(1, 4, "bt1");
 
 //PAGE 1 - RIGHT SIDE
 NexPage nex_page2 = NexPage(2, 0, "page2");
-NexDSButton nex_zyl_feder_zuluft = NexDSButton(1, 15 , "bt5");
-NexDSButton nex_zyl_feder_abluft = NexDSButton(1, 14 , "bt4");
+NexDSButton nex_zyl_feder_zuluft = NexDSButton(1, 15, "bt5");
+NexDSButton nex_zyl_feder_abluft = NexDSButton(1, 14, "bt4");
 NexDSButton nex_zyl_klemmblock = NexDSButton(1, 13, "bt3");
-NexButton nex_zyl_wippenhebel = NexButton(1, 12 , "b5");
-NexButton nex_mot_band_unten = NexButton(1, 11 , "b4");
+NexButton nex_zyl_wippenhebel = NexButton(1, 12, "b5");
+NexButton nex_mot_band_unten = NexButton(1, 11, "b4");
 NexDSButton nex_zyl_messer = NexDSButton(1, 19, "b6");
-NexButton nex_zyl_schweisstaste = NexButton(1, 9 , "b3");
-NexButton nex_einschaltventil = NexButton(1, 18 , "bt6");
+NexButton nex_zyl_schweisstaste = NexButton(1, 9, "b3");
+NexButton nex_einschaltventil = NexButton(1, 18, "bt6");
 
 //PAGE 2 - LEFT SIDE:
 NexButton nex_but_slider1_left = NexButton(2, 5, "b1");
@@ -94,49 +96,31 @@ NexButton nex_but_reset_shorttime_counter = NexButton(2, 15, "b4");
 
 //PAGE 3:
 NexPage nex_page3 = NexPage(3, 0, "page3");
-NexWaveform waveform = NexWaveform(3, 1, "s0");//DECLARATION OF WAVEFORM GRAPH
+NexWaveform waveform = NexWaveform(3, 1, "s0"); //DECLARATION OF WAVEFORM GRAPH
 
 //***************************************************************************
 //END OF OBJECT DECLARATION
 //***************************************************************************
 
-char buffer[100] = {0};  // This is needed only if you are going to receive a text from the display. You can remove it otherwise.
+char buffer[100] = { 0 }; // This is needed only if you are going to receive a text from the display. You can remove it otherwise.
 
 //***************************************************************************
 //TOUCH EVENT LIST //DECLARATION OF TOUCH EVENTS TO BE MONITORED
 //***************************************************************************
-NexTouch *nex_listen_list[] =
-{
-  &nex_page0,
-  &nex_page1,
-  &nex_page2,
-  &nex_page3,
-  &nex_but_reset_shorttime_counter,
-  &nex_but_stepback,
-  &nex_but_stepnxt,
-  &nex_but_reset_cycle,
-  &nex_but_slider1_left,
-  &nex_but_slider1_right,
-  &nex_switch_play_pause,
-  &nex_switch_mode,
-  &nex_zyl_messer,
-  &nex_zyl_klemmblock,
-  &nex_zyl_feder_zuluft,
-  &nex_zyl_feder_abluft,
-  &nex_zyl_wippenhebel,
-  &nex_mot_band_unten,
-  &nex_zyl_schweisstaste,
-  &nex_einschaltventil,
+NexTouch *nex_listen_list[] = { &nex_page0, &nex_page1, &nex_page2, &nex_page3,
+        &nex_but_reset_shorttime_counter, &nex_but_stepback, &nex_but_stepnxt, &nex_but_reset_cycle,
+        &nex_but_slider1_left, &nex_but_slider1_right, &nex_switch_play_pause, &nex_switch_mode,
+        &nex_zyl_messer, &nex_zyl_klemmblock, &nex_zyl_feder_zuluft, &nex_zyl_feder_abluft,
+        &nex_zyl_wippenhebel, &nex_mot_band_unten, &nex_zyl_schweisstaste, &nex_einschaltventil,
 
-  NULL //String terminated
-};
+        NULL //String terminated
+        };
 //***************************************************************************
 //END OF TOUCH EVENT LIST
 //***************************************************************************
 
 //***************************************************************************
-int send_to_nextion()
-{
+int send_to_nextion() {
   Serial2.write(0xff);
   Serial2.write(0xff);
   Serial2.write(0xff);
@@ -157,12 +141,12 @@ void nextion_setup()
   //INCREASE BAUD RATE
   //***************************************************************************
   /*
-    delay(500);
-    Serial2.print("baud=38400");
-    send_to_nextion();
-    Serial2.end();
-    Serial2.begin(38400);
-  */
+   delay(500);
+   Serial2.print("baud=38400");
+   send_to_nextion();
+   Serial2.end();
+   Serial2.begin(38400);
+   */
   //***************************************************************************
   //REGISTER THE EVENT CALLBACK FUNCTIONS
   //***************************************************************************
@@ -197,15 +181,14 @@ void nextion_setup()
   nex_but_reset_shorttime_counter.attachPush(nex_but_reset_shorttime_counterPushCallback);
   nex_but_reset_shorttime_counter.attachPop(nex_but_reset_shorttime_counterPopCallback);
 
-
   //***************************************************************************
   //END OF REGISTER
   //***************************************************************************
   delay(3000);
-  sendCommand("page 1");//SWITCH NEXTION TO PAGE X
+  sendCommand("page 1");  //SWITCH NEXTION TO PAGE X
   send_to_nextion();
 
-}//END OF NEXTION SETUP
+}  //END OF NEXTION SETUP
 
 //***************************************************************************
 //***************************************************************************
@@ -220,36 +203,31 @@ void nextion_loop()
 
   nexLoop(nex_listen_list); //check for any touch event
   //***************************************************************************
-  if (CurrentPage == 1)//START PAGE 1
-  {
+  if (CurrentPage == 1)  //START PAGE 1
+          {
     //*******************
     //PAGE 1 - LEFT SIDE:
     //*******************
     //UPDATE SWITCHSTATE "PLAY"/"PAUSE"
-    if (nex_state_machine_running != machine_running)
-    {
-      Serial2.print("click bt0,1");//CLICK BUTTON
+    if (nex_state_machine_running != machine_running) {
+      Serial2.print("click bt0,1");    //CLICK BUTTON
       send_to_nextion();
       nex_state_machine_running = !nex_state_machine_running;
     }
 
     //UPDATE SWITCHSTATE "STEP"/"AUTO"-MODE
 
-    if (step_mode != nex_prev_step_mode)
-    {
-      if (step_mode == true)
-      {
-        Serial2.print("click bt1,1");//CLICK BUTTON
+    if (step_mode != nex_prev_step_mode) {
+      if (step_mode == true) {
+        Serial2.print("click bt1,1");    //CLICK BUTTON
         send_to_nextion();
         Serial2.print("bt1.txt=");
         Serial2.print("\"");
         Serial2.print("STEP MODE");
         Serial2.print("\"");
         send_to_nextion();
-      }
-      else
-      {
-        Serial2.print("click bt1,1");//CLICK BUTTON
+      } else {
+        Serial2.print("click bt1,1");    //CLICK BUTTON
         send_to_nextion();
         Serial2.print("bt1.txt=");
         Serial2.print("\"");
@@ -261,47 +239,39 @@ void nextion_loop()
     }
 
     //DISPLAY IF NO STRAP DETECTED
-    if (nex_state_band_vorhanden != band_vorhanden)
-    {
-      if (band_vorhanden == false)
-      {
+    if (nex_state_band_vorhanden != band_vorhanden) {
+      if (band_vorhanden == false) {
         Serial2.print("t4.txt=");
         Serial2.print("\"");
         Serial2.print("BAND LEER!");
         Serial2.print("\"");
         send_to_nextion();
-      }
-      else
-      {
+      } else {
         Serial2.print("t4.txt=");
         Serial2.print("\"");
-        Serial2.print("");//ERASE TEXT
+        Serial2.print("");    //ERASE TEXT
         Serial2.print("\"");
         send_to_nextion();
       }
       nex_state_band_vorhanden = band_vorhanden;
     }
 
-    if (band_vorhanden == true)
-    {
+    if (band_vorhanden == true) {
       if (nex_prev_restpausenzeit != restpausenzeit)
-        if (restpausenzeit > 0 && restpausenzeit < 1000)
-        {
+        if (restpausenzeit > 0 && restpausenzeit < 1000) {
           Serial2.print("t4.txt=");
           Serial2.print("\"");
           Serial2.print("PAUSE: ");
-          Serial2.print(restpausenzeit);//SHOW REMAINING PAUSE TIME
+          Serial2.print(restpausenzeit);    //SHOW REMAINING PAUSE TIME
           Serial2.print("s");
 
           Serial2.print("\"");
           send_to_nextion();
           nex_prev_restpausenzeit = restpausenzeit;
-        }
-        else
-        {
+        } else {
           Serial2.print("t4.txt=");
           Serial2.print("\"");
-          Serial2.print("");//ERASE TEXT
+          Serial2.print("");    //ERASE TEXT
           Serial2.print("\"");
           send_to_nextion();
         }
@@ -311,8 +281,7 @@ void nextion_loop()
     //PAGE 1 - RIGHT SIDE:
     //*******************
     //UPDATE CYCLE NAME
-    if (nex_prev_cycle_step != cycle_step)
-    {
+    if (nex_prev_cycle_step != cycle_step) {
       Serial2.print("t0.txt=");
       Serial2.print("\"");
       Serial2.print(cycle_name[cycle_step - 1]);
@@ -321,80 +290,71 @@ void nextion_loop()
       nex_prev_cycle_step = cycle_step;
     }
     //UPDATE SWITCHBUTTON (dual state):
-    if (zyl_feder_zuluft.request_state() != nex_state_zyl_feder_zuluft)
-    {
-      Serial2.print("click bt5,1");//CLICK BUTTON
+    if (zyl_feder_zuluft.request_state() != nex_state_zyl_feder_zuluft) {
+      Serial2.print("click bt5,1");    //CLICK BUTTON
       send_to_nextion();
       nex_state_zyl_feder_zuluft = !nex_state_zyl_feder_zuluft;
     }
     //UPDATE SWITCHBUTTON (dual state):
-    if (zyl_feder_abluft.request_state() != nex_state_zyl_feder_abluft)
-    {
-      Serial2.print("click bt4,1");//CLICK BUTTON
+    if (zyl_feder_abluft.request_state() != nex_state_zyl_feder_abluft) {
+      Serial2.print("click bt4,1");    //CLICK BUTTON
       send_to_nextion();
       nex_state_zyl_feder_abluft = !nex_state_zyl_feder_abluft;
     }
     //UPDATE SWITCHBUTTON (dual state):
-    if (zyl_klemmblock.request_state() != nex_state_zyl_klemmblock)
-    {
-      Serial2.print("click bt3,1");//CLICK BUTTON
+    if (zyl_klemmblock.request_state() != nex_state_zyl_klemmblock) {
+      Serial2.print("click bt3,1");    //CLICK BUTTON
       send_to_nextion();
       nex_state_zyl_klemmblock = !nex_state_zyl_klemmblock;
     }
 
     //UPDATE BUTTON (momentary)
-    if (zyl_wippenhebel.request_state() != nex_state_zyl_wippenhebel)
-    {
+    if (zyl_wippenhebel.request_state() != nex_state_zyl_wippenhebel) {
       Serial2.print("click b5,");
-      Serial2.print(zyl_wippenhebel.request_state());//PUSH OR RELEASE BUTTON
+      Serial2.print(zyl_wippenhebel.request_state());    //PUSH OR RELEASE BUTTON
       send_to_nextion();
       nex_state_zyl_wippenhebel = zyl_wippenhebel.request_state();
     }
 
     //UPDATE BUTTON (momentary)
-    if (zyl_spanntaste.request_state() != nex_state_zyl_spanntaste)
-    {
+    if (zyl_spanntaste.request_state() != nex_state_zyl_spanntaste) {
       Serial2.print("click b4,");
-      Serial2.print(zyl_spanntaste.request_state());//PUSH OR RELEASE BUTTON
+      Serial2.print(zyl_spanntaste.request_state());    //PUSH OR RELEASE BUTTON
       send_to_nextion();
       nex_state_zyl_spanntaste = zyl_spanntaste.request_state();
     }
 
     //UPDATE SWITCHBUTTON (dual state):
-    if (zyl_messer.request_state() != nex_state_zyl_messer)
-    {
+    if (zyl_messer.request_state() != nex_state_zyl_messer) {
       Serial2.print("click b6,");
-      Serial2.print(zyl_messer.request_state());//PUSH OR RELEASE BUTTON
+      Serial2.print(zyl_messer.request_state());    //PUSH OR RELEASE BUTTON
       send_to_nextion();
       nex_state_zyl_messer = zyl_messer.request_state();
     }
     //UPDATE BUTTON (momentary)
-    if (zyl_schweisstaste.request_state() != nex_state_zyl_schweisstaste)
-    {
+    if (zyl_schweisstaste.request_state() != nex_state_zyl_schweisstaste) {
       Serial2.print("click b3,");
-      Serial2.print(zyl_schweisstaste.request_state());//PUSH OR RELEASE BUTTON
+      Serial2.print(zyl_schweisstaste.request_state());    //PUSH OR RELEASE BUTTON
       send_to_nextion();
       nex_state_zyl_schweisstaste = zyl_schweisstaste.request_state();
     }
 
     //UPDATE BUTTON (momentary button used as dual state toggle)
-    if (einschaltventil.request_state() != nex_state_einschaltventil)
-    {
-      Serial2.print("click bt6,1");//CLICK BUTTON
+    if (einschaltventil.request_state() != nex_state_einschaltventil) {
+      Serial2.print("click bt6,1");    //CLICK BUTTON
       send_to_nextion();
       nex_state_einschaltventil = einschaltventil.request_state();
     }
 
-  }//END PAGE 1
-  //***************************************************************************
-  if (CurrentPage == 2)//START PAGE 2
-  {
+  }    //END PAGE 1
+       //***************************************************************************
+  if (CurrentPage == 2)  //START PAGE 2
+          {
     //*******************
     //PAGE 2 - LEFT SIDE
     //*******************
 
-    if (nex_prev_startfuelldauer != startfuelldauer)
-    {
+    if (nex_prev_startfuelldauer != startfuelldauer) {
       send_to_nextion();
       Serial2.print("t4.txt=");
       Serial2.print("\"");
@@ -405,8 +365,7 @@ void nextion_loop()
       nex_prev_startfuelldauer = startfuelldauer;
     }
 
-    if (nex_prev_federkraft_int != federkraft_int && millis() > nex_update_timer)
-    {
+    if (nex_prev_federkraft_int != federkraft_int && millis() > nex_update_timer) {
       //update force:
       Serial2.print("h1.val=");
       Serial2.print(federkraft_int);
@@ -436,8 +395,7 @@ void nextion_loop()
     //PAGE 2 - RIGHT SIDE
     //*******************
 
-    if (nex_prev_longtime_counter != longtime_counter)
-    {
+    if (nex_prev_longtime_counter != longtime_counter) {
       Serial2.print("t10.txt=");
       Serial2.print("\"");
       Serial2.print(longtime_counter);
@@ -445,8 +403,7 @@ void nextion_loop()
       send_to_nextion();
       nex_prev_longtime_counter = longtime_counter;
     }
-    if (nex_prev_shorttime_counter != shorttime_counter)
-    {
+    if (nex_prev_shorttime_counter != shorttime_counter) {
       Serial2.print("t12.txt=");
       Serial2.print("\"");
       Serial2.print(shorttime_counter);
@@ -454,18 +411,16 @@ void nextion_loop()
       send_to_nextion();
       nex_prev_shorttime_counter = shorttime_counter;
     }
-    if (reset_stopwatch_active == true)
-    {
-      if (millis() - counter_reset_stopwatch > 5000)
-      {
+    if (reset_stopwatch_active == true) {
+      if (millis() - counter_reset_stopwatch > 5000) {
         shorttime_counter = 0;
         longtime_counter = 0;
       }
     }
 
-  }//END PAGE 2
-  //***************************************************************************
-}//END OF NEXTION LOOP
+  }    //END PAGE 2
+       //***************************************************************************
+}  //END OF NEXTION LOOP
 //***************************************************************************
 //***************************************************************************
 //***************************************************************************
@@ -479,98 +434,78 @@ void nextion_loop()
 //*************************************************
 //TOUCH EVENT FUNCTIONS PAGE 1 - LEFT SIDE
 //*************************************************
-void nex_switch_play_pausePushCallback(void *ptr)
-{
+void nex_switch_play_pausePushCallback(void *ptr) {
   machine_running = !machine_running;
-  if (machine_running == true)
-  {
+  if (machine_running == true) {
     clearance_next_step = true;
   }
   nex_state_machine_running = !nex_state_machine_running;
 }
-void nex_switch_modePushCallback(void *ptr)
-{
+void nex_switch_modePushCallback(void *ptr) {
   step_mode = !step_mode;
-  Serial2.print("click bt1,1");//CLICK BUTTON
+  Serial2.print("click bt1,1");  //CLICK BUTTON
   send_to_nextion();
 }
-void nex_but_stepbackPushCallback(void *ptr)
-{
-  if (cycle_step > 1)
-  {
-    cycle_step --;
+void nex_but_stepbackPushCallback(void *ptr) {
+  if (cycle_step > 1) {
+    cycle_step--;
     machine_running = false;
   }
 }
-void nex_but_stepnxtPushCallback(void *ptr)
-{
-  if (cycle_step < 11)
-  {
+void nex_but_stepnxtPushCallback(void *ptr) {
+  if (cycle_step < 11) {
     cycle_step++;
     machine_running = false;
   }
 }
-void nex_but_reset_cyclePushCallback(void *ptr)
-{
+void nex_but_reset_cyclePushCallback(void *ptr) {
   cycle_step = 1;
 }
 //*************************************************
 //TOUCH EVENT FUNCTIONS PAGE 1 - RIGHT SIDE
 //*************************************************
-void nex_zyl_feder_zuluftPushCallback(void *ptr)
-{
+void nex_zyl_feder_zuluftPushCallback(void *ptr) {
   zyl_feder_zuluft.toggle();
   nex_state_zyl_feder_zuluft = !nex_state_zyl_feder_zuluft;
 }
 
-void nex_zyl_feder_abluftPushCallback(void *ptr)
-{
+void nex_zyl_feder_abluftPushCallback(void *ptr) {
   zyl_feder_abluft.toggle();
   nex_state_zyl_feder_abluft = !nex_state_zyl_feder_abluft;
 }
 
-void nex_zyl_klemmblockPushCallback(void *ptr)
-{
+void nex_zyl_klemmblockPushCallback(void *ptr) {
   zyl_klemmblock.toggle();
   nex_state_zyl_klemmblock = !nex_state_zyl_klemmblock;
 }
 
-void nex_zyl_wippenhebelPushCallback(void *ptr)
-{
+void nex_zyl_wippenhebelPushCallback(void *ptr) {
   zyl_wippenhebel.set(1);
 }
 
-void nex_zyl_wippenhebelPopCallback(void *ptr)
-{
+void nex_zyl_wippenhebelPopCallback(void *ptr) {
   zyl_wippenhebel.set(0);
 }
 
-void nex_mot_band_untenPushCallback(void *ptr)
-{
+void nex_mot_band_untenPushCallback(void *ptr) {
   zyl_spanntaste.set(1);
 }
-void nex_mot_band_untenPopCallback(void *ptr)
-{
+void nex_mot_band_untenPopCallback(void *ptr) {
   zyl_spanntaste.set(0);
 }
-void nex_zyl_schweisstastePushCallback(void *ptr)
-{
+void nex_zyl_schweisstastePushCallback(void *ptr) {
   zyl_schweisstaste.set(1);
 }
-void nex_zyl_schweisstastePopCallback(void *ptr)
-{
+void nex_zyl_schweisstastePopCallback(void *ptr) {
   zyl_schweisstaste.set(0);
 }
-void nex_zyl_messerPushCallback(void *ptr)
-{
+void nex_zyl_messerPushCallback(void *ptr) {
   zyl_messer.set(1);
 }
-void nex_zyl_messerPopCallback(void *ptr)
-{
+void nex_zyl_messerPopCallback(void *ptr) {
   zyl_messer.set(0);
 }
-void nex_einschaltventilPushCallback(void *ptr)
-{
+void nex_einschaltventilPushCallback(void *ptr) {
   einschaltventil.toggle();
   nex_state_einschaltventil = !nex_state_einschaltventil;
 }
@@ -579,21 +514,17 @@ void nex_einschaltventilPushCallback(void *ptr)
 //TOUCH EVENT FUNCTIONS PAGE 2 - LEFT SIDE
 //*************************************************
 
-void nex_but_slider1_leftPushCallback(void *ptr)
-{
+void nex_but_slider1_leftPushCallback(void *ptr) {
 
   startfuelldauer -= 500;
-  if (startfuelldauer < 0)
-  {
+  if (startfuelldauer < 0) {
     startfuelldauer = 0;
   }
 }
 
-void nex_but_slider1_rightPushCallback(void *ptr)
-{
+void nex_but_slider1_rightPushCallback(void *ptr) {
   startfuelldauer += 500;
-  if (startfuelldauer > 7000)
-  {
+  if (startfuelldauer > 7000) {
     startfuelldauer = 7000;
   }
 }
@@ -601,28 +532,24 @@ void nex_but_slider1_rightPushCallback(void *ptr)
 //*************************************************
 //TOUCH EVENT FUNCTIONS PAGE 2 - RIGHT SIDE
 //*************************************************
-void nex_but_reset_shorttime_counterPushCallback(void *ptr)
-{
+void nex_but_reset_shorttime_counterPushCallback(void *ptr) {
   shorttime_counter = 0;
   //RESET LONGTIME COUNTER IF RESET BUTTON IS PRESSED LONG ENOUGH:
   counter_reset_stopwatch = millis();
   reset_stopwatch_active = true;
 }
 
-void nex_but_reset_shorttime_counterPopCallback(void *ptr)
-{
+void nex_but_reset_shorttime_counterPopCallback(void *ptr) {
   reset_stopwatch_active = false;
 }
 //*************************************************
 //TOUCH EVENT FUNCTIONS PAGE CHANGES
 //*************************************************
-void nex_page0PushCallback(void *ptr)
-{
+void nex_page0PushCallback(void *ptr) {
   CurrentPage = 0;
 
 }
-void nex_page1PushCallback(void *ptr)
-{
+void nex_page1PushCallback(void *ptr) {
   CurrentPage = 1;
 
   //REFRESH BUTTON STATES:
@@ -630,7 +557,7 @@ void nex_page1PushCallback(void *ptr)
   nex_prev_step_mode = true;
 
   nex_state_zyl_feder_zuluft = 0;
-  nex_state_zyl_feder_abluft = 1;//INVERTED VALVE LOGIC
+  nex_state_zyl_feder_abluft = 1;  //INVERTED VALVE LOGIC
   nex_state_zyl_klemmblock = 0;
   nex_state_zyl_wippenhebel = 0;
   nex_state_zyl_spanntaste = 0;
@@ -641,8 +568,7 @@ void nex_page1PushCallback(void *ptr)
   nex_state_einschaltventil = 0;
 }
 
-void nex_page2PushCallback(void *ptr)
-{
+void nex_page2PushCallback(void *ptr) {
   CurrentPage = 2;
   //REFRESH BUTTON STATES:
   nex_prev_startfuelldauer = 0;
@@ -652,8 +578,7 @@ void nex_page2PushCallback(void *ptr)
   nex_prev_federdruck = 10000;
 }
 
-void nex_page3PushCallback(void *ptr)
-{
+void nex_page3PushCallback(void *ptr) {
   CurrentPage = 3;
   //REFRESH BUTTON STATES:
   nex_prev_startfuelldauer = 0;

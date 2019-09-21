@@ -1,4 +1,3 @@
-
 /*
  * *****************************************************************************
  * BXT_RIG
@@ -19,15 +18,15 @@
 
 #include <Cylinder.h>    // https://github.com/chischte/cylinder-library
 #include <Nextion.h>     // https://github.com/itead/ITEADLIB_Arduino_Nextion 
-#include <Timeout.h>     // https://github.com/chischte/timeout-library.git
+#include <Insomnia.h>    // https://github.com/chischte/insomnia-delay-library.git
 #include <Controllino.h>
 
 //=============================================================================
 //
 // EINSTELLPARAMETER FÜR TESTZYKLUS:
-byte Zyklenanzahl = 4;//HIER ANZAHL ZYKLEN EINGEBEN // NACH DEM LETZTEN ZYKLUS FOLGT EINE PAUSE
-unsigned long Pausenzeit = 300;//[s] HIER PAUSENZEIT IN SEKUNDEN EINGEBEN
-int Bandvorschubdauer=7000;//[ms] HIER BANDVORSCHUBDAUER IN MILLISEKUNDEN EINGEBEN
+byte Zyklenanzahl = 4; //HIER ANZAHL ZYKLEN EINGEBEN // NACH DEM LETZTEN ZYKLUS FOLGT EINE PAUSE
+unsigned long Pausenzeit = 300; //[s] HIER PAUSENZEIT IN SEKUNDEN EINGEBEN
+int Bandvorschubdauer = 7000; //[ms] HIER BANDVORSCHUBDAUER IN MILLISEKUNDEN EINGEBEN
 //
 //=============================================================================
 
@@ -118,28 +117,28 @@ unsigned int federkraft_int;
 //*****************************************************************************
 void setup() {
 
-	Serial.begin(500000);//start serial connection
+  Serial.begin(500000); //start serial connection
 
-	nextion_setup();
-	setup_eeprom_counter();
+  nextion_setup();
+  setup_eeprom_counter();
 
-	pinMode(stop_button, INPUT);
-	pinMode(start_button, INPUT);
-	pinMode(bandsensor_oben, INPUT);
-	pinMode(bandsensor_unten, INPUT);
-	pinMode(taster_startposition, INPUT);
-	pinMode(taster_endposition, INPUT);
-	pinMode(drucksensor, INPUT);
+  pinMode(stop_button, INPUT);
+  pinMode(start_button, INPUT);
+  pinMode(bandsensor_oben, INPUT);
+  pinMode(bandsensor_unten, INPUT);
+  pinMode(taster_startposition, INPUT);
+  pinMode(taster_endposition, INPUT);
+  pinMode(drucksensor, INPUT);
 
-	pinMode(green_light, OUTPUT);
-	pinMode(red_light, OUTPUT);
-	delay(2000);
+  pinMode(green_light, OUTPUT);
+  pinMode(red_light, OUTPUT);
+  delay(2000);
 
-	einschaltventil.set(1); //ÖFFNET DAS HAUPTLUFTVENTIL
+  einschaltventil.set(1); //ÖFFNET DAS HAUPTLUFTVENTIL
 
-	Serial.println("EXIT SETUP");
+  Serial.println("EXIT SETUP");
 
-}//END MAIN SETUP
+} //END MAIN SETUP
 
 //*****************************************************************************
 //********************#*********#####***#####***######*************************
@@ -151,20 +150,19 @@ void setup() {
 
 void loop() {
 
-	read_n_toggle();
-	lights();
+  read_n_toggle();
+  lights();
 
-	if (machine_running == true)
-	{
-		run_main_test_cycle();
-	}
+  if (machine_running == true) {
+    run_main_test_cycle();
+  }
 
-	nextion_loop();
-	eeprom_counter();
+  nextion_loop();
+  eeprom_counter();
 
-	//runtime = millis() - runtime_stopwatch;
-	//Serial.println(runtime);
-	//runtime_stopwatch = millis();
+  //runtime = millis() - runtime_stopwatch;
+  //Serial.println(runtime);
+  //runtime_stopwatch = millis();
 
-}//END MAIN LOOP
+}	//END MAIN LOOP
 //*****************************************************************************
