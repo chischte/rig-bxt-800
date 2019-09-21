@@ -10,9 +10,15 @@
  * https://github.com/chischte/bxt-rig
  * *****************************************************************************
  * TODO:
- * AUSSTEHENDE TASKS:
- * BANDVORSCHUBDAUER AUF DISPLAY EINSTELLBAR MACHEN
- * ZYKLEN/PAUSENSTEUERUNG AUF DISPLAY EINSTELLBAR MACHEN
+ * Bandvorschubdauer auf Display einstellbar machen
+ * Zyklen/Pausensteuerung auf Display einstellbar machen
+ * Variablen umbenennen
+ * Timer durch insomniatimer ersetzen
+ * EEPROM.ino durch EEPROM-counter library ersetzen
+ * bool==true und ==false in der Regel entfernen
+ * Globale Variablen minimieren
+ * Kommentare und Anmerkungen an Style Guide anpassen und vereinheitlichen
+ * Compiler Warnungen anschauen
  * *****************************************************************************
  */
 
@@ -82,7 +88,7 @@ byte cycle_step = 1;
 int calmcounter;
 unsigned long timer_next_step;
 
-int startfuelldauer;
+unsigned int startfuelldauer;
 unsigned int federdruck_beruhigt;
 unsigned int prev_federdruck_beruhigt;
 

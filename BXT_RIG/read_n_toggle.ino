@@ -1,31 +1,27 @@
 int read_n_toggle() {
-  //*****************************************************************************
-  //IN AUTO MODE, MACHINE RUNS FROM STEP TO STEP AUTOMATICALLY:
 
+  //IN AUTO MODE, MACHINE RUNS FROM STEP TO STEP AUTOMATICALLY:
   if (step_mode == false)  //=AUTO MODE
           {
     clearance_next_step = true;
   }
-  //*****************************************************************************
-  //IN STEP MODE, MACHINE STOPS AFTER EVERY COMPLETED CYCLYE:
 
+  //IN STEP MODE, MACHINE STOPS AFTER EVERY COMPLETED CYCLYE:
   if (step_mode == true && clearance_next_step == false) {
     machine_running = false;
   }
-  //*****************************************************************************
-  //START TEST RIG:
 
+  //START TEST RIG:
   if (digitalRead(start_button) == HIGH) {
     machine_running = true;
     clearance_next_step = true;
   }
-  //*****************************************************************************
-  //STOP TEST_RIG:
 
+  //STOP TEST_RIG:
   if (digitalRead(stop_button) == HIGH) {
     machine_running = false;
   }
-  //*****************************************************************************
+
   //BANDSENSOREN ABFRAGEN:
 
   if (digitalRead(bandsensor_oben) == HIGH && digitalRead(bandsensor_unten) == HIGH) {
@@ -38,15 +34,12 @@ int read_n_toggle() {
     machine_running = false;
   }
 
-  //*****************************************************************************
   //START- UND ENDPOSITIONSSCHALTER ABFRAGEN:
-
   startposition_erreicht = digitalRead(taster_startposition);
   endposition_erreicht = digitalRead(taster_endposition);
 
   //*****************************************************************************
   //READ PRESSURE SENSOR AND CALCULATE PRESSURE AND AIR-SPRING-FORCE:
-
   //DRUCKSENSOR 0-10V => 0-12bar
   //CONTROLLINO ANALOG INPUT VALUE 0-1023, 30mV per digit (controlino.biz)
   //10V   => analogRead 333.3 (10V/30mV)
@@ -108,6 +101,5 @@ int read_n_toggle() {
   //SET LAST DIGIT ZERO
   federkraft_int = federkraft_int / 10;
   federkraft_int = federkraft_int * 10;
-  //*****************************************************************************
 
 } //END OF READ_N_TOGGLE
