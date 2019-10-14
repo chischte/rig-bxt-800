@@ -24,8 +24,8 @@
 
 #include <Cylinder.h>    // https://github.com/chischte/cylinder-library
 #include <Nextion.h>     // https://github.com/itead/ITEADLIB_Arduino_Nextion 
-#include <Insomnia.h>    // https://github.com/chischte/insomnia-delay-library.git
-#include <Controllino.h>
+#include <Insomnia.h>    // https://github.com/chischte/insomnia-delay-library
+#include <Controllino.h> // https://github.com/CONTROLLINO-PLC/CONTROLLINO_Library
 
 //=============================================================================
 //
