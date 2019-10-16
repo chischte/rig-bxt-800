@@ -123,7 +123,7 @@ unsigned int federkraft_int;
 //*****************************************************************************
 void setup() {
 
-  Serial.begin(500000); //start serial connection
+  Serial.begin(115200); //start serial connection
 
   nextion_setup();
   setup_eeprom_counter();

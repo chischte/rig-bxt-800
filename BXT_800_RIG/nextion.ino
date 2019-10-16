@@ -27,8 +27,8 @@
 //***************************************************************************
 int CurrentPage;
 String cycle_name[] = { "1 AUFWECKEN", "2 VORSCHIEBEN", "3 SCHNEIDEN", "4 FESTKLEMMEN",
-        "5 KRAFTAUFBAU", "6 SPANNEN", "7 SCHWEISSEN", "8 ABKUELHEN", "9 ENTSPANNEN",
-        "10 ENTKLEMMEN", "11 ZURUECKFAHREN", "12 PAUSE" };
+    "5 KRAFTAUFBAU", "6 SPANNEN", "7 SCHWEISSEN", "8 ABKUELHEN", "9 ENTSPANNEN", "10 ENTKLEMMEN",
+    "11 ZURUECKFAHREN", "12 PAUSE" };
 //***************************************************************************
 //NEXTION SWITCH STATES LIST
 //Every nextion switch button (dualstate) needs a switchstate variable to control switchtoggle
@@ -77,17 +77,17 @@ NexDSButton nex_switch_play_pause = NexDSButton(1, 2, "bt0");
 NexDSButton nex_switch_mode = NexDSButton(1, 4, "bt1");
 
 //PAGE 1 - RIGHT SIDE
-NexPage nex_page2 = NexPage(2, 0, "page2");
-NexDSButton nex_zyl_feder_zuluft = NexDSButton(1, 15, "bt5");
-NexDSButton nex_zyl_feder_abluft = NexDSButton(1, 14, "bt4");
-NexDSButton nex_zyl_klemmblock = NexDSButton(1, 13, "bt3");
-NexButton nex_zyl_wippenhebel = NexButton(1, 12, "b5");
-NexButton nex_mot_band_unten = NexButton(1, 11, "b4");
-NexDSButton nex_zyl_messer = NexDSButton(1, 19, "b6");
-NexButton nex_zyl_schweisstaste = NexButton(1, 9, "b3");
-NexButton nex_einschaltventil = NexButton(1, 18, "bt6");
+NexDSButton nex_zyl_feder_zuluft = NexDSButton(1, 14, "bt5");
+NexDSButton nex_zyl_feder_abluft = NexDSButton(1, 13, "bt4");
+NexDSButton nex_zyl_klemmblock = NexDSButton(1, 12, "bt3");
+NexButton nex_zyl_wippenhebel = NexButton(1, 11, "b5");
+NexButton nex_mot_band_unten = NexButton(1, 10, "b4");
+NexDSButton nex_zyl_messer = NexDSButton(1, 17, "b6");
+NexButton nex_zyl_schweisstaste = NexButton(1, 8, "b3");
+NexButton nex_einschaltventil = NexButton(1, 16, "bt6");
 
 //PAGE 2 - LEFT SIDE:
+NexPage nex_page2 = NexPage(2, 0, "page2");
 NexButton nex_but_slider1_left = NexButton(2, 5, "b1");
 NexButton nex_but_slider1_right = NexButton(2, 6, "b2");
 
@@ -108,12 +108,12 @@ char buffer[100] = { 0 }; // This is needed only if you are going to receive a t
 //TOUCH EVENT LIST //DECLARATION OF TOUCH EVENTS TO BE MONITORED
 //***************************************************************************
 NexTouch *nex_listen_list[] = { &nex_page0, &nex_page1, &nex_page2, &nex_page3,
-        &nex_but_reset_shorttime_counter, &nex_but_stepback, &nex_but_stepnxt, &nex_but_reset_cycle,
-        &nex_but_slider1_left, &nex_but_slider1_right, &nex_switch_play_pause, &nex_switch_mode,
-        &nex_zyl_messer, &nex_zyl_klemmblock, &nex_zyl_feder_zuluft, &nex_zyl_feder_abluft,
-        &nex_zyl_wippenhebel, &nex_mot_band_unten, &nex_zyl_schweisstaste, &nex_einschaltventil,
+    &nex_but_reset_shorttime_counter, &nex_but_stepback, &nex_but_stepnxt, &nex_but_reset_cycle,
+    &nex_but_slider1_left, &nex_but_slider1_right, &nex_switch_play_pause, &nex_switch_mode,
+    &nex_zyl_messer, &nex_zyl_klemmblock, &nex_zyl_feder_zuluft, &nex_zyl_feder_abluft,
+    &nex_zyl_wippenhebel, &nex_mot_band_unten, &nex_zyl_schweisstaste, &nex_einschaltventil,
 
-        NULL //String terminated
+    NULL //String terminated
         };
 //***************************************************************************
 //END OF TOUCH EVENT LIST
@@ -215,18 +215,8 @@ void nextion_loop()
       if (step_mode == true) {
         Serial2.print("click bt1,1");    //CLICK BUTTON
         send_to_nextion();
-        Serial2.print("bt1.txt=");
-        Serial2.print("\"");
-        Serial2.print("STEP MODE");
-        Serial2.print("\"");
-        send_to_nextion();
       } else {
         Serial2.print("click bt1,1");    //CLICK BUTTON
-        send_to_nextion();
-        Serial2.print("bt1.txt=");
-        Serial2.print("\"");
-        Serial2.print("AUTO MODE");
-        Serial2.print("\"");
         send_to_nextion();
       }
       nex_prev_step_mode = step_mode;
@@ -449,6 +439,7 @@ void nex_but_stepnxtPushCallback(void *ptr) {
 }
 void nex_but_reset_cyclePushCallback(void *ptr) {
   cycle_step = 1;
+  step_mode = true;
 }
 //*************************************************
 //TOUCH EVENT FUNCTIONS PAGE 1 - RIGHT SIDE
