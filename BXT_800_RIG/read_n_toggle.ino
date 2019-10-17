@@ -12,19 +12,19 @@ int read_n_toggle() {
   }
 
   //START TEST RIG:
-  if (digitalRead(start_button) == HIGH) {
+  if (digitalRead(start_button)) {
     machine_running = true;
     clearance_next_step = true;
   }
 
   //STOP TEST_RIG:
-  if (digitalRead(stop_button) == HIGH) {
+  if (digitalRead(stop_button)) {
     machine_running = false;
   }
 
   //BANDSENSOREN ABFRAGEN:
 
-  if (digitalRead(bandsensor_oben) == HIGH && digitalRead(bandsensor_unten) == HIGH) {
+  if (digitalRead(bandsensor_oben) && digitalRead(bandsensor_unten)) {
     band_vorhanden = true;
     error_blink = false;
   } else {

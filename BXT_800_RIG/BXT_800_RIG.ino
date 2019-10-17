@@ -11,15 +11,19 @@
  * *****************************************************************************
  * TODO:
  * Variablen umbenennen
+ * Alle Schalter und Taster debouncen
  * Timer durch insomniatimer ersetzen
  * Globale Variablen minimieren
  * Kommentare und Anmerkungen an Style Guide anpassen und vereinheitlichen
  * Compiler Warnungen anschauen
  * Step/ Auto logik vereinfachen
  * Reset button soll auch Zylinder abstellen
- * Ev. "Restpausenzeit" direkt in insomnia library integrieren.
+ * Insomnia library timeout für main cycle verwenden
+ * Restpausenzeit direkt von insomnia library abfragen.
  * Bug beheben auf Page 2 wird die bandvorschubdauer angezeigt oben rechts...
  * ...beim Wechsel von Seite 3 auf 2
+ * IMPLEMENT NEW LOGIC FOR MAIN CYCLE:
+ * run if: (autoMode && autoModeRunning) || (!autoMode && stepModeRunning)
  * *****************************************************************************
  */
 
@@ -141,8 +145,9 @@ enum mainCycleSteps {
 
 int numberOfMainCycleSteps = endOfMainCycleEnum;
 // DEFINE NAMES TO DISPLAY ON THE TOUCH SCREEN:
-String cycle_name[] = { "AUFWECKEN", "VORSCHIEBEN", "SCHNEIDEN", "FESTKLEMMEN", "STARTDRUCK",
-    "SPANNEN", "SCHWEISSEN", "ABKUELHEN", "ENTSPANNEN", "WIPPENHEBEL", "ZURUECKFAHREN", "PAUSE" };
+String cycle_name[] =
+        { "AUFWECKEN", "VORSCHIEBEN", "SCHNEIDEN", "FESTKLEMMEN", "STARTDRUCK", "SPANNEN",
+                "SCHWEISSEN", "ABKUELHEN", "ENTSPANNEN", "WIPPENHEBEL", "ZURUECKFAHREN", "PAUSE" };
 
 void SwitchToNextStep() {
   clearance_next_step = false;
@@ -196,11 +201,16 @@ void loop() {
   lights();
   nextion_loop();
 
+  // HIER NEUE LOGIK IMPLEMENTIEREN:
+  // machineRunning = ((autoMode && autoModeRunning) || (stepMode && stepModeRunning)
+
   if (machine_running) {
+    // HIER NEUE LOGIK IMPLEMENTIEREN:
+    // if (machineRunning && nextStepTimer.timedOut)
+
     restpausenzeit = (timer_next_step - (millis() - prev_time)) / 1000; //[s]calculates remaining pause time for the display
 
     if (clearance_next_step && (millis() - prev_time) > timer_next_step) {
-
 
       switch (cycle_step) {
 
