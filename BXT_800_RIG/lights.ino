@@ -1,17 +1,17 @@
-int lights() {
+void lights() {
   //*****************************************************************************
   //GREEN LIGHT:
 
-  if (step_mode == false)  //IN AUTOMATIC MODE THE GREEN LIGHT IS ON PERMANENTLY
+  if (!step_mode)  //IN AUTOMATIC MODE THE GREEN LIGHT IS ON PERMANENTLY
           {
-    if (machine_running == true) {
+    if (machine_running) {
       digitalWrite((green_light), HIGH);
     } else {
       digitalWrite((green_light), LOW);
     }
   }
 
-  if (step_mode == true)  //IN STEP MODE THE GREEN IS OFF BETWEEN STEPS
+  if (step_mode)  //IN STEP MODE THE GREEN IS OFF BETWEEN STEPS
     if (machine_running == true && clearance_next_step == true) {
       digitalWrite((green_light), HIGH);
     } else {
@@ -21,14 +21,11 @@ int lights() {
   //*****************************************************************************
   //RED LIGHT / ERROR BLINKER:
 
-  if (error_blink == true) {
-
-    if (millis() >= timer_error_blink) {
+  if (error_blink) {
+    if (errorBlinkTimer.delayTimeUp(700)) {
       digitalWrite((red_light), !(digitalRead(red_light)));
-      timer_error_blink = millis() + 700;
     }
-  }
-  if (error_blink == false) {
+  } else {
     digitalWrite((red_light), LOW);
   }
   //*****************************************************************************

@@ -39,8 +39,8 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
  /home/realslimshady/Arduino/libraries/insomnia-delay-library/Insomnia.h \
  /home/realslimshady/Arduino/libraries/CONTROLLINO/Controllino.h \
  /opt/eclipsearduino/sloeber/arduinoPlugin/packages/arduino/hardware/avr/1.6.23/libraries/SPI/src/SPI.h \
- ../BXT_800_RIG.ino ../eeprom_storage.ino ../lights.ino ../main_cycle.ino \
- ../nextion.ino ../read_n_toggle.ino
+ /home/realslimshady/Arduino/libraries/eeprom-counter-library/EEPROM_Counter.h \
+ ../BXT_800_RIG.ino ../lights.ino ../nextion.ino ../read_n_toggle.ino
 
 /opt/eclipsearduino/sloeber/arduinoPlugin/packages/arduino/hardware/avr/1.6.23/cores/arduino/Arduino.h:
 
@@ -122,13 +122,11 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
 
 /opt/eclipsearduino/sloeber/arduinoPlugin/packages/arduino/hardware/avr/1.6.23/libraries/SPI/src/SPI.h:
 
+/home/realslimshady/Arduino/libraries/eeprom-counter-library/EEPROM_Counter.h:
+
 ../BXT_800_RIG.ino:
 
-../eeprom_storage.ino:
-
 ../lights.ino:
-
-../main_cycle.ino:
 
 ../nextion.ino:
 

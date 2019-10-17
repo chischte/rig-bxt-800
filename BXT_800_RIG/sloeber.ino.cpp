@@ -2,22 +2,21 @@
 //This is a automatic generated file
 //Please do not modify this file
 //If you touch this file your change will be overwritten during the next build
-//This file has been generated on 2019-10-16 16:04:47
+//This file has been generated on 2019-10-17 15:45:50
 
 #include "Arduino.h"
 #include <Cylinder.h>
 #include <Nextion.h>
 #include <Insomnia.h>
 #include <Controllino.h>
+#include <EEPROM_Counter.h>
 
+void SwitchToNextStep() ;
 void setup() ;
 void loop() ;
-void setup_eeprom_counter()  ;
-void eeprom_counter() ;
-int lights() ;
-int run_main_test_cycle() ;
+void lights() ;
 int send_to_nextion() ;
-void nextion_setup()     ;
+void nextion_setup()   ;
 void nextion_loop()  ;
 void nex_switch_play_pausePushCallback(void *ptr) ;
 void nex_switch_modePushCallback(void *ptr) ;
@@ -40,6 +39,12 @@ void nex_but_slider1_leftPushCallback(void *ptr) ;
 void nex_but_slider1_rightPushCallback(void *ptr) ;
 void nex_but_reset_shorttime_counterPushCallback(void *ptr) ;
 void nex_but_reset_shorttime_counterPopCallback(void *ptr) ;
+void nexButton1LeftPushCallback(void *ptr) ;
+void nexButton1RightPushCallback(void *ptr) ;
+void nexButton2LeftPushCallback(void *ptr) ;
+void nexButton2RightPushCallback(void *ptr) ;
+void nexButton3LeftPushCallback(void *ptr) ;
+void nexButton3RightPushCallback(void *ptr) ;
 void nex_page0PushCallback(void *ptr) ;
 void nex_page1PushCallback(void *ptr) ;
 void nex_page2PushCallback(void *ptr) ;
@@ -48,9 +53,7 @@ int read_n_toggle() ;
 
 #include "BXT_800_RIG.ino"
 
-#include "eeprom_storage.ino"
 #include "lights.ino"
-#include "main_cycle.ino"
 #include "nextion.ino"
 #include "read_n_toggle.ino"
 

@@ -10,6 +10,7 @@ RM := rm
 -include sources.mk
 -include subdir.mk
 -include libraries/insomnia-delay-library/subdir.mk
+-include libraries/eeprom-counter-library/subdir.mk
 -include libraries/cylinder-library/subdir.mk
 -include libraries/SoftwareSerial/src/subdir.mk
 -include libraries/SPI/src/subdir.mk

@@ -44,5 +44,6 @@ libraries/SD/src/utility \
 libraries/SPI/src \
 libraries/SoftwareSerial/src \
 libraries/cylinder-library \
+libraries/eeprom-counter-library \
 libraries/insomnia-delay-library \
 

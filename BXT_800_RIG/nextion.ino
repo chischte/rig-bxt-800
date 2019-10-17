@@ -50,13 +50,15 @@ bool stopwatch_running;
 bool reset_stopwatch_active;
 
 byte nex_prev_cycle_step;
-
+long nexPrevCyclesInARow;
+long nexPrevLongCooldownTime;
+long nexPrevStrapEjectFeedTime;
+long nex_prev_shorttime_counter;
+long nex_prev_longtime_counter;
 unsigned int nex_prev_startfuelldauer;
 unsigned int nex_prev_federkraft_int;
 unsigned int nex_prev_federdruck;
 unsigned long nex_prev_restpausenzeit;
-unsigned long nex_prev_shorttime_counter;
-unsigned long nex_prev_longtime_counter;
 unsigned long button_push_stopwatch;
 unsigned long counter_reset_stopwatch;
 unsigned long nex_update_timer;
@@ -96,7 +98,20 @@ NexButton nex_but_reset_shorttime_counter = NexButton(2, 15, "b4");
 
 //PAGE 3:
 NexPage nex_page3 = NexPage(3, 0, "page3");
-NexWaveform waveform = NexWaveform(3, 1, "s0"); //DECLARATION OF WAVEFORM GRAPH
+//NexButton nexButton1Left = NexButton(3, 5, "b1");
+//NexButton nexButton1Right = NexButton(3, 6, "b2");
+//NexButton nexButton2Left = NexButton(3, 8, "b0");
+//NexButton nexButton2Right = NexButton(3, 10, "b3");
+//NexButton nexButton3Left = NexButton(3, 12, "b4");
+//NexButton nexButton3Right = NexButton(3, 14, "b5");
+
+
+NexButton nexButton1Left = NexButton(2, 18, "b0");
+NexButton nexButton1Right = NexButton(2, 20, "b3");
+NexButton nexButton2Left = NexButton(2, 21, "b5");
+NexButton nexButton2Right = NexButton(2, 23, "b6");
+NexButton nexButton3Left = NexButton(2, 24, "b7");
+NexButton nexButton3Right = NexButton(2, 26, "b8");
 
 //***************************************************************************
 //END OF OBJECT DECLARATION
@@ -108,11 +123,15 @@ char buffer[100] = { 0 }; // This is needed only if you are going to receive a t
 //TOUCH EVENT LIST //DECLARATION OF TOUCH EVENTS TO BE MONITORED
 //***************************************************************************
 NexTouch *nex_listen_list[] = { &nex_page0, &nex_page1, &nex_page2, &nex_page3,
+    // PAGE 0 1 2:
     &nex_but_reset_shorttime_counter, &nex_but_stepback, &nex_but_stepnxt, &nex_but_reset_cycle,
     &nex_but_slider1_left, &nex_but_slider1_right, &nex_switch_play_pause, &nex_switch_mode,
     &nex_zyl_messer, &nex_zyl_klemmblock, &nex_zyl_feder_zuluft, &nex_zyl_feder_abluft,
     &nex_zyl_wippenhebel, &nex_mot_band_unten, &nex_zyl_schweisstaste, &nex_einschaltventil,
-
+    // PAGE 3:
+    &nexButton1Left, &nexButton1Right, &nexButton2Left, &nexButton2Right, &nexButton3Left,
+    &nexButton3Right,
+    // END OF DECLARATION
     NULL //String terminated
         };
 //***************************************************************************
@@ -126,12 +145,7 @@ int send_to_nextion() {
   Serial2.write(0xff);
 }
 //***************************************************************************
-//***************************************************************************
-//***************************************************************************
-//***************************************************************************
 void nextion_setup()
-//***************************************************************************
-//***************************************************************************
 //***************************************************************************
 //***************************************************************************
 { //START NEXTION SETUP
@@ -150,6 +164,7 @@ void nextion_setup()
   //***************************************************************************
   //REGISTER THE EVENT CALLBACK FUNCTIONS
   //***************************************************************************
+  // PAGE 0 1 2:
   nex_page0.attachPush(nex_page0PushCallback);
   nex_page1.attachPush(nex_page1PushCallback);
   nex_page2.attachPush(nex_page2PushCallback);
@@ -168,6 +183,13 @@ void nextion_setup()
   nex_zyl_feder_zuluft.attachPush(nex_zyl_feder_zuluftPushCallback);
   nex_zyl_feder_abluft.attachPush(nex_zyl_feder_abluftPushCallback);
   nex_einschaltventil.attachPush(nex_einschaltventilPushCallback);
+  // PAGE 3:
+  nexButton1Left.attachPush(nexButton1LeftPushCallback);
+  nexButton1Right.attachPush(nexButton1RightPushCallback);
+  nexButton1Left.attachPush(nexButton2LeftPushCallback);
+  nexButton1Right.attachPush(nexButton2RightPushCallback);
+  nexButton1Left.attachPush(nexButton3LeftPushCallback);
+  nexButton1Right.attachPush(nexButton3RightPushCallback);
 
   //*****PUSH+POP:
   nex_zyl_wippenhebel.attachPush(nex_zyl_wippenhebelPushCallback);
@@ -210,21 +232,15 @@ void nextion_loop()
     }
 
     //UPDATE SWITCHSTATE "STEP"/"AUTO"-MODE
-
     if (step_mode != nex_prev_step_mode) {
-      if (step_mode == true) {
-        Serial2.print("click bt1,1");    //CLICK BUTTON
-        send_to_nextion();
-      } else {
-        Serial2.print("click bt1,1");    //CLICK BUTTON
-        send_to_nextion();
-      }
+      Serial2.print("click bt1,1");    //CLICK BUTTON
+      send_to_nextion();
       nex_prev_step_mode = step_mode;
     }
 
     //DISPLAY IF NO STRAP DETECTED
     if (nex_state_band_vorhanden != band_vorhanden) {
-      if (band_vorhanden == false) {
+      if (!band_vorhanden) {
         Serial2.print("t4.txt=");
         Serial2.print("\"");
         Serial2.print("BAND LEER!");
@@ -240,25 +256,23 @@ void nextion_loop()
       nex_state_band_vorhanden = band_vorhanden;
     }
 
-    if (band_vorhanden == true) {
-      if (nex_prev_restpausenzeit != restpausenzeit)
-        if (restpausenzeit > 0 && restpausenzeit < 1000) {
-          Serial2.print("t4.txt=");
-          Serial2.print("\"");
-          Serial2.print("PAUSE: ");
-          Serial2.print(restpausenzeit);    //SHOW REMAINING PAUSE TIME
-          Serial2.print("s");
-
-          Serial2.print("\"");
-          send_to_nextion();
-          nex_prev_restpausenzeit = restpausenzeit;
-        } else {
-          Serial2.print("t4.txt=");
-          Serial2.print("\"");
-          Serial2.print("");    //ERASE TEXT
-          Serial2.print("\"");
-          send_to_nextion();
-        }
+    if (band_vorhanden && (nex_prev_restpausenzeit != restpausenzeit)) {
+      if (restpausenzeit > 0 && restpausenzeit < 1000) {
+        Serial2.print("t4.txt=");
+        Serial2.print("\"");
+        Serial2.print("PAUSE: ");
+        Serial2.print(restpausenzeit);    //SHOW REMAINING PAUSE TIME
+        Serial2.print("s");
+        Serial2.print("\"");
+        send_to_nextion();
+        nex_prev_restpausenzeit = restpausenzeit;
+      } else {
+        Serial2.print("t4.txt=");
+        Serial2.print("\"");
+        Serial2.print("");    //ERASE TEXT
+        Serial2.print("\"");
+        send_to_nextion();
+      }
     }
 
     //*******************
@@ -330,23 +344,21 @@ void nextion_loop()
       nex_state_einschaltventil = einschaltventil.request_state();
     }
 
-  }    //END PAGE 1
-       //***************************************************************************
-  if (CurrentPage == 2)  //START PAGE 2
+  }
+//*******************
+//PAGE 2 - LEFT SIDE
+//*******************
+  if (CurrentPage == 2)    //START PAGE 2
           {
-    //*******************
-    //PAGE 2 - LEFT SIDE
-    //*******************
-
-    if (nex_prev_startfuelldauer != startfuelldauer) {
+    if (nex_prev_startfuelldauer != eepromCounter.getValue(startfuelldauer)) {
       send_to_nextion();
       Serial2.print("t4.txt=");
       Serial2.print("\"");
-      Serial2.print(startfuelldauer);
+      Serial2.print(eepromCounter.getValue(startfuelldauer));
       Serial2.print(" ms");
       Serial2.print("\"");
       send_to_nextion();
-      nex_prev_startfuelldauer = startfuelldauer;
+      nex_prev_startfuelldauer = eepromCounter.getValue(startfuelldauer);
     }
 
     if (nex_prev_federkraft_int != federkraft_int && millis() > nex_update_timer) {
@@ -378,34 +390,69 @@ void nextion_loop()
     //*******************
     //PAGE 2 - RIGHT SIDE
     //*******************
-
-    if (nex_prev_longtime_counter != longtime_counter) {
+    if (nex_prev_longtime_counter != eepromCounter.getValue(longtimeCounter)) {
       Serial2.print("t10.txt=");
       Serial2.print("\"");
-      Serial2.print(longtime_counter);
+      Serial2.print(eepromCounter.getValue(longtimeCounter));
       Serial2.print("\"");
       send_to_nextion();
-      nex_prev_longtime_counter = longtime_counter;
+      nex_prev_longtime_counter = eepromCounter.getValue(longtimeCounter);
     }
-    if (nex_prev_shorttime_counter != shorttime_counter) {
+    if (nex_prev_shorttime_counter != eepromCounter.getValue(shorttimeCounter)) {
       Serial2.print("t12.txt=");
       Serial2.print("\"");
-      Serial2.print(shorttime_counter);
+      Serial2.print(eepromCounter.getValue(shorttimeCounter));
       Serial2.print("\"");
       send_to_nextion();
-      nex_prev_shorttime_counter = shorttime_counter;
+      nex_prev_shorttime_counter = eepromCounter.getValue(shorttimeCounter);
     }
-    if (reset_stopwatch_active == true) {
+    if (reset_stopwatch_active) {
       if (millis() - counter_reset_stopwatch > 5000) {
-        shorttime_counter = 0;
-        longtime_counter = 0;
+        eepromCounter.set(shorttimeCounter, 0);
+        eepromCounter.set(longtimeCounter, 0);
       }
     }
 
-  }    //END PAGE 2
-       //***************************************************************************
+  }
+//*******************
+//PAGE 3
+//*******************
+  if (CurrentPage == 3) {  //START PAGE 3
+    if (nexPrevCyclesInARow != eepromCounter.getValue(cyclesInARow)) {
+      send_to_nextion();
+      Serial2.print("t4.txt=");
+      Serial2.print("\"");
+      //Serial2.print("111");
+      Serial2.print(eepromCounter.getValue(cyclesInARow));
+      Serial2.print("\"");
+      send_to_nextion();
+      nex_prev_startfuelldauer = eepromCounter.getValue(cyclesInARow);
+    }
+
+    if (nexPrevLongCooldownTime != eepromCounter.getValue(longCooldownTime)) {
+      Serial2.print("t5.txt=");
+      Serial2.print("\"");
+      //Serial2.print("222");
+      Serial2.print(eepromCounter.getValue(longCooldownTime));
+      Serial2.print(" s");
+      Serial2.print("\"");
+      send_to_nextion();
+      nex_prev_longtime_counter = eepromCounter.getValue(longCooldownTime);
+    }
+
+    if (nexPrevStrapEjectFeedTime != eepromCounter.getValue(strapEjectFeedTime)) {
+      Serial2.print("t7.txt=");
+      Serial2.print("\"");
+      //Serial2.print("333");
+      Serial2.print(eepromCounter.getValue(strapEjectFeedTime));
+      Serial2.print(" s");
+      Serial2.print("\"");
+      send_to_nextion();
+      nex_prev_longtime_counter = eepromCounter.getValue(strapEjectFeedTime);
+    }
+  }
+
 }  //END OF NEXTION LOOP
-//***************************************************************************
 
 //***************************************************************************
 //TOUCH EVENT FUNCTIONS //PushCallback = Press event //PopCallback = Release event
@@ -415,7 +462,7 @@ void nextion_loop()
 //*************************************************
 void nex_switch_play_pausePushCallback(void *ptr) {
   machine_running = !machine_running;
-  if (machine_running == true) {
+  if (machine_running) {
     clearance_next_step = true;
   }
   nex_state_machine_running = !nex_state_machine_running;
@@ -495,17 +542,18 @@ void nex_einschaltventilPushCallback(void *ptr) {
 //*************************************************
 
 void nex_but_slider1_leftPushCallback(void *ptr) {
-
-  startfuelldauer -= 500;
-  if (startfuelldauer < 0) {
-    startfuelldauer = 0;
+  long newValue = eepromCounter.getValue(startfuelldauer) - 100;
+  eepromCounter.set(startfuelldauer, newValue);
+  if (eepromCounter.getValue(startfuelldauer) < 0) {
+    eepromCounter.set(startfuelldauer, 0);
   }
 }
 
 void nex_but_slider1_rightPushCallback(void *ptr) {
-  startfuelldauer += 500;
-  if (startfuelldauer > 7000) {
-    startfuelldauer = 7000;
+  long newValue = eepromCounter.getValue(startfuelldauer) + 100;
+  eepromCounter.set(startfuelldauer, newValue);
+  if (eepromCounter.getValue(startfuelldauer) > 7000) {
+    eepromCounter.set(startfuelldauer, 7000);
   }
 }
 
@@ -513,8 +561,8 @@ void nex_but_slider1_rightPushCallback(void *ptr) {
 //TOUCH EVENT FUNCTIONS PAGE 2 - RIGHT SIDE
 //*************************************************
 void nex_but_reset_shorttime_counterPushCallback(void *ptr) {
-  shorttime_counter = 0;
-  //RESET LONGTIME COUNTER IF RESET BUTTON IS PRESSED LONG ENOUGH:
+  eepromCounter.set(shorttimeCounter, 0);
+//RESET LONGTIME COUNTER IF RESET BUTTON IS PRESSED LONG ENOUGH:
   counter_reset_stopwatch = millis();
   reset_stopwatch_active = true;
 }
@@ -523,16 +571,72 @@ void nex_but_reset_shorttime_counterPopCallback(void *ptr) {
   reset_stopwatch_active = false;
 }
 //*************************************************
+//TOUCH EVENT FUNCTIONS PAGE 3
+//*************************************************
+void nexButton1LeftPushCallback(void *ptr) {
+  Serial.println("OK, GOT IT1le");
+  long newValue = eepromCounter.getValue(cyclesInARow) - 1;
+  eepromCounter.set(cyclesInARow, newValue);
+  if (eepromCounter.getValue(cyclesInARow) < 0) {
+    eepromCounter.set(cyclesInARow, 0);
+  }
+}
+
+void nexButton1RightPushCallback(void *ptr) {
+  Serial.println("OK, GOT IT1ri");
+  long newValue = eepromCounter.getValue(cyclesInARow) + 1;
+  eepromCounter.set(cyclesInARow, newValue);
+  if (eepromCounter.getValue(cyclesInARow) > 10) {
+    eepromCounter.set(cyclesInARow, 10);
+  }
+}
+
+void nexButton2LeftPushCallback(void *ptr) {
+  Serial.println("OK, GOT ITle2");
+  long newValue = eepromCounter.getValue(longCooldownTime) - 10;
+  eepromCounter.set(longCooldownTime, newValue);
+  if (eepromCounter.getValue(longCooldownTime) < 0) {
+    eepromCounter.set(longCooldownTime, 0);
+  }
+}
+
+void nexButton2RightPushCallback(void *ptr) {
+  Serial.println("OK, GOT ITre2");
+  long newValue = eepromCounter.getValue(longCooldownTime) + 10;
+  eepromCounter.set(longCooldownTime, newValue);
+  if (eepromCounter.getValue(longCooldownTime) > 600) {
+    eepromCounter.set(longCooldownTime, 600);
+  }
+}
+
+void nexButton3LeftPushCallback(void *ptr) {
+  Serial.println("OK, GOT ITle3");
+  long newValue = eepromCounter.getValue(strapEjectFeedTime) - 1;
+  eepromCounter.set(strapEjectFeedTime, newValue);
+  if (eepromCounter.getValue(strapEjectFeedTime) < 0) {
+    eepromCounter.set(strapEjectFeedTime, 0);
+  }
+}
+void nexButton3RightPushCallback(void *ptr) {
+  Serial.println("OK, GOT ITre3");
+  long newValue = eepromCounter.getValue(strapEjectFeedTime) + 1;
+  eepromCounter.set(strapEjectFeedTime, newValue);
+  if (eepromCounter.getValue(strapEjectFeedTime) > 20) {
+    eepromCounter.set(strapEjectFeedTime, 20);
+  }
+}
+
+//*************************************************
 //TOUCH EVENT FUNCTIONS PAGE CHANGES
 //*************************************************
 void nex_page0PushCallback(void *ptr) {
   CurrentPage = 0;
-
 }
+
 void nex_page1PushCallback(void *ptr) {
   CurrentPage = 1;
 
-  //REFRESH BUTTON STATES:
+//REFRESH BUTTON STATES:
   nex_prev_cycle_step = 0;
   nex_prev_step_mode = true;
 
@@ -550,7 +654,7 @@ void nex_page1PushCallback(void *ptr) {
 
 void nex_page2PushCallback(void *ptr) {
   CurrentPage = 2;
-  //REFRESH BUTTON STATES:
+//REFRESH BUTTON STATES:
   nex_prev_startfuelldauer = 0;
   nex_prev_shorttime_counter = 0;
   nex_prev_longtime_counter = 0;
@@ -560,10 +664,10 @@ void nex_page2PushCallback(void *ptr) {
 
 void nex_page3PushCallback(void *ptr) {
   CurrentPage = 3;
-  //REFRESH BUTTON STATES:
-  nex_prev_startfuelldauer = 0;
-  nex_prev_shorttime_counter = 0;
-  nex_prev_longtime_counter = 0;
+//REFRESH BUTTON STATES:
+  nexPrevCyclesInARow = 0;
+  nexPrevLongCooldownTime = 0;
+  nexPrevStrapEjectFeedTime = 0;
 }
 //***************************************************************************
 //END OF TOUCH EVENT FUNCTIONS
