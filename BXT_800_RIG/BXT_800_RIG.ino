@@ -16,6 +16,10 @@
  * Kommentare und Anmerkungen an Style Guide anpassen und vereinheitlichen
  * Compiler Warnungen anschauen
  * Step/ Auto logik vereinfachen
+ * Reset button soll auch Zylinder abstellen
+ * Ev. "Restpausenzeit" direkt in insomnia library integrieren.
+ * Bug beheben auf Page 2 wird die bandvorschubdauer angezeigt oben rechts...
+ * ...beim Wechsel von Seite 3 auf 2
  * *****************************************************************************
  */
 
@@ -74,7 +78,7 @@ bool endposition_erreicht;
 bool startfuellung_running = false;
 
 //byte Testzyklenzaehler;
-int cycle_step = 1;
+byte cycle_step = 0;
 
 int calmcounter;
 unsigned long timer_next_step;
@@ -88,6 +92,7 @@ unsigned long runtime;
 unsigned long runtime_stopwatch;
 unsigned long startfuelltimer;
 unsigned long prev_time;
+long bandVorschubDauer;
 long calmcountersum;
 
 // DRUCKRECHNUNG:
@@ -115,9 +120,36 @@ int numberOfEepromValues = endOfEepromEnum;
 int eepromSize = 4096;
 EEPROM_Counter eepromCounter(eepromSize, numberOfEepromValues);
 
+//*****************************************************************************
+// DEFINE NAMES AND SEQUENCE OF STEPS FOR THE MAIN CYCLE:
+//*****************************************************************************
+enum mainCycleSteps {
+  AUFWECKEN,
+  VORSCHIEBEN,
+  SCHNEIDEN,
+  FESTKLEMMEN,
+  STARTDRUCK,
+  SPANNEN,
+  SCHWEISSEN,
+  ABKUEHLEN,
+  ENTSPANNEN,
+  WIPPENHEBEL,
+  ZURUECKFAHREN,
+  PAUSE,
+  endOfMainCycleEnum
+};
+
+int numberOfMainCycleSteps = endOfMainCycleEnum;
+// DEFINE NAMES TO DISPLAY ON THE TOUCH SCREEN:
+String cycle_name[] = { "AUFWECKEN", "VORSCHIEBEN", "SCHNEIDEN", "FESTKLEMMEN", "STARTDRUCK",
+    "SPANNEN", "SCHWEISSEN", "ABKUELHEN", "ENTSPANNEN", "WIPPENHEBEL", "ZURUECKFAHREN", "PAUSE" };
+
 void SwitchToNextStep() {
   clearance_next_step = false;
   cycle_step++;
+  if (cycle_step == numberOfMainCycleSteps) {
+    cycle_step = 0;
+  }
 }
 
 //*****************************************************************************
@@ -160,7 +192,6 @@ void setup() {
 //*****************************************************************************
 
 void loop() {
-
   read_n_toggle();
   lights();
   nextion_loop();
@@ -168,39 +199,37 @@ void loop() {
   if (machine_running) {
     restpausenzeit = (timer_next_step - (millis() - prev_time)) / 1000; //[s]calculates remaining pause time for the display
 
-    if (clearance_next_step && millis() - prev_time > timer_next_step) {
+    if (clearance_next_step && (millis() - prev_time) > timer_next_step) {
+
+
       switch (cycle_step) {
-      //***************************************************************************
-      case 1: // GERÄT AUFWECKEN (WIPPENHEBEL ZIEHEN):
-        //***************************************************************************
+
+      case AUFWECKEN: // GERÄT AUFWECKEN (WIPPENHEBEL ZIEHEN):
         zyl_wippenhebel.stroke(1500, 1000);     //(Ausfahrzeit,Einfahrzeit)
 
         if (zyl_wippenhebel.stroke_completed()) {
           SwitchToNextStep();
         }
         break;
-        //***************************************************************************
-      case 2: // BAND VORSCHIEBEN:
-        //***************************************************************************
-        unsigned long bandVorschubDauer = eepromCounter.getValue(strapEjectFeedTime);
+
+      case VORSCHIEBEN: // BAND VORSCHIEBEN:
+        bandVorschubDauer = eepromCounter.getValue(strapEjectFeedTime) * 1000;
         zyl_spanntaste.stroke(bandVorschubDauer, 300);      //(Vorschubdauer,Pause)
 
         if (zyl_spanntaste.stroke_completed()) {
           SwitchToNextStep();
         }
         break;
-        //***************************************************************************
-      case 3: // BAND SCHNEIDEN:
-        //***************************************************************************
+
+      case SCHNEIDEN: // BAND SCHNEIDEN:
         zyl_messer.stroke(1500, 500);
 
         if (zyl_messer.stroke_completed()) {
           SwitchToNextStep();
         }
         break;
-        //***************************************************************************
-      case 4: // BAND IM KLEMMBLOCK FESTKLEMMEN:
-        //***************************************************************************
+
+      case FESTKLEMMEN: // BAND IM KLEMMBLOCK FESTKLEMMEN:
         zyl_klemmblock.set(1);
         {
           prev_time = millis();
@@ -208,9 +237,8 @@ void loop() {
           SwitchToNextStep();
         }
         break;
-        //***************************************************************************
-      case 5: // STARTKRAFT AUFBAUEN:
-        //***************************************************************************
+
+      case STARTDRUCK: // STARTKRAFT AUFBAUEN:
         if (!startfuellung_running) {
           startfuellung_running = true;
           startfuelltimer = millis();
@@ -223,30 +251,26 @@ void loop() {
           SwitchToNextStep();
         }
         break;
-        //***************************************************************************
-      case 6: // BAND SPANNEN:
-        //***************************************************************************
+
+      case SPANNEN: // BAND SPANNEN:
         zyl_spanntaste.set(1);      //Spanntaste betätigen
         if (endposition_erreicht) {
           prev_time = millis();
-          timer_next_step = 500; //spanntaste bleibt noch kurz betätigt, damit das Gerät die Maximalkraft aufbaut
+          timer_next_step = 500; //Spanntaste bleibt noch kurz betätigt, damit das Gerät die Maximalkraft aufbaut
           SwitchToNextStep();
         }
-
         break;
-        //***************************************************************************
-      case 7: // BAND SCHWEISSEN:
-        //***************************************************************************
+
+      case SCHWEISSEN: // BAND SCHWEISSEN:
         zyl_spanntaste.set(0);      //Spanntaste lösen
-        zyl_schweisstaste.stroke(800, 0); //Schweisstaste betätigen
+        zyl_schweisstaste.stroke(1000, 2000); //Schweisstaste betätigen
 
         if (zyl_schweisstaste.stroke_completed()) {
           SwitchToNextStep();
         }
         break;
-        //***************************************************************************
-      case 8: // ZYLINDER ENTLÜFTEN und ABKÜHLEN:
-        //***************************************************************************
+
+      case ABKUEHLEN: // ZYLINDER ENTLÜFTEN und ABKÜHLEN:
         zyl_feder_zuluft.set(0); //1=füllen 0=geschlossen
         zyl_feder_abluft.set(0); //1=geschlossen 0=entlüften
 
@@ -257,26 +281,23 @@ void loop() {
           timer_next_step = 4000; //Restluft kann entweichen
         }
         break;
-        //***************************************************************************
-      case 9: // KLEMMBLOCK LöSEN:
-        //***************************************************************************
+
+      case ENTSPANNEN: // KLEMMBLOCK LöSEN:
         zyl_klemmblock.set(0);
         SwitchToNextStep();
         prev_time = millis();
         timer_next_step = 500;
         break;
-        //***************************************************************************
-      case 10: // BANDSPANNUNG LÖSEN:
-        //***************************************************************************
+
+      case WIPPENHEBEL: // BANDSPANNUNG LÖSEN:
         zyl_wippenhebel.stroke(1500, 1000);
 
         if (zyl_wippenhebel.stroke_completed()) {
           SwitchToNextStep();
         }
         break;
-        //***************************************************************************
-      case 11: // BREMSZYLINDER ZURÜCKFAHREN:
-        //***************************************************************************
+
+      case ZURUECKFAHREN: // BREMSZYLINDER ZURÜCKFAHREN:
         zyl_feder_zuluft.set(1);      // 1=füllen 0=geschlossen
         zyl_feder_abluft.set(0);      // 1=geschlossen 0=entlüften
 
@@ -293,9 +314,8 @@ void loop() {
           }
         }
         break;
-        //***************************************************************************
-      case 12: // Abkuehlpause
-        //***************************************************************************
+
+      case PAUSE: // Abkuehlpause
         static byte testZyklenZaehler;
         testZyklenZaehler++;
         if (testZyklenZaehler == eepromCounter.getValue(cyclesInARow)) {
@@ -304,9 +324,7 @@ void loop() {
           testZyklenZaehler = 0;
         }
         SwitchToNextStep();
-        cycle_step = 1;     // Testzyklus kann wieder von vorne beginnen
         break;
-        //***************************************************************************
       } //END switch (cycle_step)
     }
   }

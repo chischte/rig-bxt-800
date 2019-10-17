@@ -26,9 +26,7 @@
 //DECLARATION OF VARIABLES
 //***************************************************************************
 int CurrentPage;
-String cycle_name[] = { "1 AUFWECKEN", "2 VORSCHIEBEN", "3 SCHNEIDEN", "4 FESTKLEMMEN",
-    "5 KRAFTAUFBAU", "6 SPANNEN", "7 SCHWEISSEN", "8 ABKUELHEN", "9 ENTSPANNEN", "10 ENTKLEMMEN",
-    "11 ZURUECKFAHREN", "12 PAUSE" };
+
 //***************************************************************************
 //NEXTION SWITCH STATES LIST
 //Every nextion switch button (dualstate) needs a switchstate variable to control switchtoggle
@@ -131,7 +129,7 @@ NexTouch *nex_listen_list[] = { &nex_page0, &nex_page1, &nex_page2, &nex_page3,
 //***************************************************************************
 
 //***************************************************************************
-int send_to_nextion() {
+void send_to_nextion() {
   Serial2.write(0xff);
   Serial2.write(0xff);
   Serial2.write(0xff);
@@ -271,10 +269,13 @@ void nextion_loop()
     //PAGE 1 - RIGHT SIDE:
     //*******************
     //UPDATE CYCLE NAME
+
     if (nex_prev_cycle_step != cycle_step) {
       Serial2.print("t0.txt=");
       Serial2.print("\"");
-      Serial2.print(cycle_name[cycle_step - 1]);
+      Serial2.print(cycle_step + 1); // write the number of the step
+      Serial2.print(" ");
+      Serial2.print(cycle_name[cycle_step]); // write the name of the step
       Serial2.print("\"");
       send_to_nextion();
       nex_prev_cycle_step = cycle_step;
@@ -414,7 +415,6 @@ void nextion_loop()
       send_to_nextion();
       Serial2.print("t4.txt=");
       Serial2.print("\"");
-      //Serial2.print("111");
       Serial2.print(eepromCounter.getValue(cyclesInARow));
       Serial2.print("\"");
       send_to_nextion();
@@ -435,7 +435,6 @@ void nextion_loop()
     if (nexPrevStrapEjectFeedTime != eepromCounter.getValue(strapEjectFeedTime)) {
       Serial2.print("t7.txt=");
       Serial2.print("\"");
-      //Serial2.print("333");
       Serial2.print(eepromCounter.getValue(strapEjectFeedTime));
       Serial2.print(" s");
       Serial2.print("\"");
@@ -465,19 +464,19 @@ void nex_switch_modePushCallback(void *ptr) {
   send_to_nextion();
 }
 void nex_but_stepbackPushCallback(void *ptr) {
-  if (cycle_step > 1) {
+  if (cycle_step > 0) {
     cycle_step--;
     machine_running = false;
   }
 }
 void nex_but_stepnxtPushCallback(void *ptr) {
-  if (cycle_step < 11) {
+  if (cycle_step < (numberOfMainCycleSteps-1)) {
     cycle_step++;
     machine_running = false;
   }
 }
 void nex_but_reset_cyclePushCallback(void *ptr) {
-  cycle_step = 1;
+  cycle_step = 0;
   step_mode = true;
 }
 //*************************************************
@@ -566,7 +565,6 @@ void nex_but_reset_shorttime_counterPopCallback(void *ptr) {
 //TOUCH EVENT FUNCTIONS PAGE 3
 //*************************************************
 void nexButton1LeftPushCallback(void *ptr) {
-  Serial.println("OK, GOT IT1le");
   long newValue = eepromCounter.getValue(cyclesInARow) - 1;
   eepromCounter.set(cyclesInARow, newValue);
   if (eepromCounter.getValue(cyclesInARow) < 0) {
@@ -575,7 +573,6 @@ void nexButton1LeftPushCallback(void *ptr) {
 }
 
 void nexButton1RightPushCallback(void *ptr) {
-  Serial.println("OK, GOT IT1ri");
   long newValue = eepromCounter.getValue(cyclesInARow) + 1;
   eepromCounter.set(cyclesInARow, newValue);
   if (eepromCounter.getValue(cyclesInARow) > 10) {
@@ -584,7 +581,6 @@ void nexButton1RightPushCallback(void *ptr) {
 }
 
 void nexButton2LeftPushCallback(void *ptr) {
-  Serial.println("OK, GOT ITle2");
   long newValue = eepromCounter.getValue(longCooldownTime) - 10;
   eepromCounter.set(longCooldownTime, newValue);
   if (eepromCounter.getValue(longCooldownTime) < 0) {
@@ -593,7 +589,6 @@ void nexButton2LeftPushCallback(void *ptr) {
 }
 
 void nexButton2RightPushCallback(void *ptr) {
-  Serial.println("OK, GOT ITre2");
   long newValue = eepromCounter.getValue(longCooldownTime) + 10;
   eepromCounter.set(longCooldownTime, newValue);
   if (eepromCounter.getValue(longCooldownTime) > 600) {
@@ -602,7 +597,6 @@ void nexButton2RightPushCallback(void *ptr) {
 }
 
 void nexButton3LeftPushCallback(void *ptr) {
-  Serial.println("OK, GOT ITle3");
   long newValue = eepromCounter.getValue(strapEjectFeedTime) - 1;
   eepromCounter.set(strapEjectFeedTime, newValue);
   if (eepromCounter.getValue(strapEjectFeedTime) < 0) {
@@ -610,7 +604,6 @@ void nexButton3LeftPushCallback(void *ptr) {
   }
 }
 void nexButton3RightPushCallback(void *ptr) {
-  Serial.println("OK, GOT ITre3");
   long newValue = eepromCounter.getValue(strapEjectFeedTime) + 1;
   eepromCounter.set(strapEjectFeedTime, newValue);
   if (eepromCounter.getValue(strapEjectFeedTime) > 20) {
@@ -629,7 +622,7 @@ void nex_page1PushCallback(void *ptr) {
   CurrentPage = 1;
 
 //REFRESH BUTTON STATES:
-  nex_prev_cycle_step = 0;
+  nex_prev_cycle_step = 1;
   nex_prev_step_mode = true;
 
   nex_state_zyl_feder_zuluft = 0;
