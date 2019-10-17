@@ -98,20 +98,12 @@ NexButton nex_but_reset_shorttime_counter = NexButton(2, 15, "b4");
 
 //PAGE 3:
 NexPage nex_page3 = NexPage(3, 0, "page3");
-//NexButton nexButton1Left = NexButton(3, 5, "b1");
-//NexButton nexButton1Right = NexButton(3, 6, "b2");
-//NexButton nexButton2Left = NexButton(3, 8, "b0");
-//NexButton nexButton2Right = NexButton(3, 10, "b3");
-//NexButton nexButton3Left = NexButton(3, 12, "b4");
-//NexButton nexButton3Right = NexButton(3, 14, "b5");
-
-
-NexButton nexButton1Left = NexButton(2, 18, "b0");
-NexButton nexButton1Right = NexButton(2, 20, "b3");
-NexButton nexButton2Left = NexButton(2, 21, "b5");
-NexButton nexButton2Right = NexButton(2, 23, "b6");
-NexButton nexButton3Left = NexButton(2, 24, "b7");
-NexButton nexButton3Right = NexButton(2, 26, "b8");
+NexButton nexButton1Left = NexButton(3, 5, "b1");
+NexButton nexButton1Right = NexButton(3, 6, "b2");
+NexButton nexButton2Left = NexButton(3, 8, "b0");
+NexButton nexButton2Right = NexButton(3, 10, "b3");
+NexButton nexButton3Left = NexButton(3, 12, "b4");
+NexButton nexButton3Right = NexButton(3, 14, "b5");
 
 //***************************************************************************
 //END OF OBJECT DECLARATION
@@ -186,10 +178,10 @@ void nextion_setup()
   // PAGE 3:
   nexButton1Left.attachPush(nexButton1LeftPushCallback);
   nexButton1Right.attachPush(nexButton1RightPushCallback);
-  nexButton1Left.attachPush(nexButton2LeftPushCallback);
-  nexButton1Right.attachPush(nexButton2RightPushCallback);
-  nexButton1Left.attachPush(nexButton3LeftPushCallback);
-  nexButton1Right.attachPush(nexButton3RightPushCallback);
+  nexButton2Left.attachPush(nexButton2LeftPushCallback);
+  nexButton2Right.attachPush(nexButton2RightPushCallback);
+  nexButton3Left.attachPush(nexButton3LeftPushCallback);
+  nexButton3Right.attachPush(nexButton3RightPushCallback);
 
   //*****PUSH+POP:
   nex_zyl_wippenhebel.attachPush(nex_zyl_wippenhebelPushCallback);
