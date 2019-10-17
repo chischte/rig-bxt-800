@@ -1,13 +1,13 @@
 int read_n_toggle() {
 
   //IN AUTO MODE, MACHINE RUNS FROM STEP TO STEP AUTOMATICALLY:
-  if (step_mode == false)  //=AUTO MODE
+  if (!step_mode)  //=AUTO MODE
           {
     clearance_next_step = true;
   }
 
   //IN STEP MODE, MACHINE STOPS AFTER EVERY COMPLETED CYCLYE:
-  if (step_mode == true && clearance_next_step == false) {
+  if (step_mode   && !clearance_next_step) {
     machine_running = false;
   }
 
