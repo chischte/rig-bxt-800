@@ -121,8 +121,9 @@ enum eepromCounter {
   endOfEepromEnum
 };
 int numberOfEepromValues = endOfEepromEnum;
-int eepromSize = 4096;
-EEPROM_Counter eepromCounter(eepromSize, numberOfEepromValues);
+int eepromMinAddress = 0;
+int eepromMaxAddress = 4095;
+EEPROM_Counter eepromCounter(eepromMinAddress, eepromMaxAddress, numberOfEepromValues);
 
 //*****************************************************************************
 // DEFINE NAMES AND SEQUENCE OF STEPS FOR THE MAIN CYCLE:
@@ -145,9 +146,8 @@ enum mainCycleSteps {
 
 int numberOfMainCycleSteps = endOfMainCycleEnum;
 // DEFINE NAMES TO DISPLAY ON THE TOUCH SCREEN:
-String cycle_name[] =
-        { "AUFWECKEN", "VORSCHIEBEN", "SCHNEIDEN", "FESTKLEMMEN", "STARTDRUCK", "SPANNEN",
-                "SCHWEISSEN", "ABKUELHEN", "ENTSPANNEN", "WIPPENHEBEL", "ZURUECKFAHREN", "PAUSE" };
+String cycle_name[] = { "AUFWECKEN", "VORSCHIEBEN", "SCHNEIDEN", "FESTKLEMMEN", "STARTDRUCK",
+    "SPANNEN", "SCHWEISSEN", "ABKUELHEN", "ENTSPANNEN", "WIPPENHEBEL", "ZURUECKFAHREN", "PAUSE" };
 
 void SwitchToNextStep() {
   clearance_next_step = false;
