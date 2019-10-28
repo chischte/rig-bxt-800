@@ -123,7 +123,7 @@ enum eepromCounter {
 int numberOfEepromValues = endOfEepromEnum;
 int eepromMinAddress = 0;
 int eepromMaxAddress = 4095;
-EEPROM_Counter eepromCounter(eepromMinAddress, eepromMaxAddress, numberOfEepromValues);
+EEPROM_Counter eepromCounter;
 
 //*****************************************************************************
 // DEFINE NAMES AND SEQUENCE OF STEPS FOR THE MAIN CYCLE:
@@ -165,7 +165,7 @@ void SwitchToNextStep() {
 //*****************######***######*****#*****######**#*************************
 //*****************************************************************************
 void setup() {
-
+  eepromCounter.setup(eepromMinAddress, eepromMaxAddress, numberOfEepromValues);
   Serial.begin(115200); //start serial connection
 
   nextion_setup();
